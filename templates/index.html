@@ -13,5 +13,13 @@
                 <button type="submit">Upload</button>
             </form>
         </div>
+        <div>
+            <h2>Shared Files</h2>
+            <ul>
+                {% for file in files %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     </body>
 </html>

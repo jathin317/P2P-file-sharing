@@ -9,9 +9,10 @@ if not os.path.exists(UPLOAD_FOLDER):
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/')
-def hello():
-    return render_template('index.html')
+@app.route('/', methods=['GET'])
+def index():
+    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    return render_template('index.html', files=files)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -28,6 +29,7 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         print(file.filename)
         return 'File uploaded successfull'
+        
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
