@@ -17,7 +17,7 @@
             <h2>Shared Files</h2>
             <ul>
                 {% for file in files %}
-                    <li>{{ file }}</li>
+                    <li><a href="/download/{{ file }}">{{ file }}</a></li>
                 {% endfor %}
             </ul>
         </div>

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, send_file
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'uploads'
@@ -29,7 +29,10 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         print(file.filename)
         return 'File uploaded successfull'
-        
+    
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
