@@ -123,3 +123,12 @@ button:active {
     margin-right: 12px;
     font-size: 1.2rem;
 }
+
+/* Center images inside card (e.g., QR code) */
+.card img {
+    display: block;
+    margin: 0 auto;
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+}
