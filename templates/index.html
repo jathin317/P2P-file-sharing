@@ -4,26 +4,41 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>P2P File Sharing</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script src="{{ url_for('static', filename='file_upload_script.js') }}"></script>
     </head>
-    <body>
-        <h1>P2P File Sharing</h1>
-        
-        <div>
-            <input type="file" id="fileInput">
-            <button onclick="uploadFile()">Upload File</button>
-            <p id="status"></p>
-        </div>
+    <body>   
+        <div class="container">
+            <h1>P2P File Sharing</h1>
 
-        <div>
-            <img src = "{{ url_for('static', filename='qr_code.png') }}" alt="QR Code">
-        </div>
+            <div class="card">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput">
+                </div>
+                <button id="uploadBtn" onclick="uploadFile()">Upload File</button>
 
-        <div>
-            <h2>Shared Files</h2>
-            <ul>
-                {% for file in files %}
-                    <li><a href="/download/{{ file }}">{{ file }}</a></li>
-                {% endfor %}
-            </ul>
+                <div id="progressContainer">
+                    <div id="progressBar"></div> 
+                </div>
+                <p id="status"></p>
+            </div>
+
+            <div class="card">
+                <img src = "{{ url_for('static', filename='qr_code.png') }}" alt="QR Code">
+            </div>
+
+            <div class="card">
+                <h2 style="margin-top: 0; font-size: 1.2rem;">Shared Files</h2>
+                <ul class="file-list">
+                    {% for file in files %}
+                        <li class="file-item">
+                            <a class="file-link" href="/download/{{ file }}">{{ file }}</a>
+                        </li>
+                    {% else %}
+                        <p style="color: #8E8E93; font-size: 0.9rem;">No files shared yet.</p>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+    </body>
+</html>

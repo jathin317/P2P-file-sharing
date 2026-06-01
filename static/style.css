@@ -1,0 +1,125 @@
+:root {
+    --primary-color: #0A84FF;
+    --primary: var(--primary-color);
+    --background: #0B0B0F;
+    --card-bg: #111214;
+    --text-main: #E5E5EA;
+    --text-muted: #9AA0A6;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--background);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    padding: 25px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.file-input-wrapper {
+    margin-bottom: 15px;
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 10px 0;
+    background: transparent;
+    color: var(--text-main);
+}
+
+button {
+    width: 100%;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.08s ease;
+}
+
+button:active {
+    opacity: 0.9;
+    transform: translateY(1px);
+}
+
+#progressContainer {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    margin-top: 15px;
+    overflow: hidden;
+    display: none; /* Hidden until upload starts */
+}
+
+#progressBar {
+    height: 100%;
+    width: 0%;
+    background-color: var(--primary);
+    transition: width 0.2s ease;
+}
+
+#status {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-item {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-link {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 500;
+    transition: color 0.12s ease;
+}
+
+.file-link:hover {
+    color: var(--primary);
+}
+
+.file-link::before {
+    content: "📄";
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
