@@ -4,15 +4,17 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>P2P File Sharing</title>
+        <script src="{{ url_for('static', filename='file_upload_script.js') }}"></script>
     </head>
     <body>
         <h1>P2P File Sharing</h1>
+        
         <div>
-            <form action="/upload" method="post" enctype="multipart/form-data">
-                <input type="file" name="file">
-                <button type="submit">Upload</button>
-            </form>
+            <input type="file" id="fileInput">
+            <button onclick="uploadFile()">Upload File</button>
+            <p id="status"></p>
         </div>
+
         <div>
             <h2>Shared Files</h2>
             <ul>
@@ -21,5 +23,3 @@
                 {% endfor %}
             </ul>
         </div>
-    </body>
-</html>
