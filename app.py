@@ -2,10 +2,6 @@ import os
 from flask import Flask, render_template, request, send_from_directory, redirect, url_for, url_for
 from werkzeug.utils import secure_filename
 from waitress import serve
-import socket
-import threading
-import time
-import json
 
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
@@ -13,18 +9,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def get_local_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-    try:
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    except Exception:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
 
 
 @app.route('/', methods=['GET'])
@@ -70,6 +54,4 @@ def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 if __name__ == '__main__':
-    print(get_local_ip())
     serve(app, host='0.0.0.0', port=5000)
-    
