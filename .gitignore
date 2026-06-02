@@ -1,4 +1,3 @@
 /uploads
-.gitignore
 /.venv
-/.vscode/
+/.vscode
