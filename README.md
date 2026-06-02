@@ -1,4 +1,4 @@
-# LAN Drop 🚀
+# P2P FILE-SHARING
 
 A lightning-fast, mobile-first local file-sharing tool. Transfer large files between devices on the same Wi-Fi network with zero setup—just scan a QR code and go.
 
