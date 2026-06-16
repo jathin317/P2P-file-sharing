@@ -22,12 +22,16 @@
         </div>
 
         <dialog id="fileUpload" class="card">
-            <h2 id="receiver_username">Sending file to: N/A</h2>
+            <div class="dialog-header">
+                <h2 id="receiver_username">Sending file to: N/A</h2>
+            </div>
             <div class="upload-area">
                 <input type="file" id="fileInput" style="display: none;">
-                <button id="selectFileBtn">Select File</button>
-                <button id="sendFileBtn" disabled>Send</button>
                 <p id="fileNameDisplay">No file selected</p>
+                <button id="selectFileBtn">Select File</button>
+                <button id="sendFileBtn" disabled>Send</button>            
+                <button id="closeFileUploadBtn" class="close-btn">&times;</button>
+
             </div>
         </dialog>
 

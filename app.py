@@ -31,4 +31,4 @@ def disconnect():
         socketio.emit("user_list", { "users": [{ "sid": sid, "username": username } for sid, username in users.items()] })
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000, ssl_context="adhoc")
