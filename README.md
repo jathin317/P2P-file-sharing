@@ -1,69 +1,46 @@
-# P2P FILE-SHARING
+# Local P2P File Sharing
 
-A lightning-fast, mobile-first local file-sharing tool. Transfer large files between devices on the same Wi-Fi network with zero setup—just scan a QR code and go.
+A real-time, peer-to-peer file sharing web application designed specifically for Local Area Networks (LAN). This application allows devices connected to the same network to discover each other and transfer files directly browser-to-browser, without the data passing through a central server.
 
-## ✨ Features
+## Features
 
-* **Instant Mobile Connection:** Automatically detects your local IP and generates a terminal QR code. No typing IP addresses into your phone.
-* **Large File Support (Chunking):** Bypasses traditional memory limits by slicing files into 10MB chunks in the browser before sending them to the server.
-* **Production-Grade Speed:** Runs on **Waitress** (a pure-Python WSGI server), allowing for significantly faster transfers and better concurrency than the default Flask server.
-* **Mobile-First UI:** A clean, responsive web interface with a real-time animated progress bar designed specifically for phone screens.
-* **Secure File Handling:** Implements Werkzeug's `secure_filename` to prevent directory traversal attacks.
+* **Real-Time Discovery:** Instantly see other users who join the local network session.
+* **Direct P2P Transfers:** Utilizes WebRTC Data Channels to send file data directly between peers.
+* **Chunked File Processing:** Reads and transmits files in 16KB chunks to handle larger file sizes efficiently.
+* **Offline-Friendly (LAN):** Bypasses the need for external STUN/TURN servers by utilizing local network IP addresses.
+* **Ad-Hoc Secure Context:** Includes a self-signed SSL context to satisfy modern browser security requirements for WebRTC.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-* **Backend:** Python, Flask, Waitress
-* **Frontend:** HTML5, CSS3 (Modern Flexbox/Variables), Vanilla JavaScript
-* **Extras:** `qrcode` (Terminal QR generation)
+* **Backend:** Python, Flask, Flask-SocketIO
+* **Frontend:** HTML, CSS, Vanilla JavaScript
+* **Protocols:** WebRTC (RTCPeerConnection, RTCDataChannel), WebSockets (Socket.IO)
 
-## 📦 Installation & Setup
+## Prerequisites
+
+* Python 3.x
+* `pip` (Python package manager)
+
+## Installation
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/jathin317/P2P-file-sharing.git
-   cd P2P-file-sharing
-   ```
+   git clone <your-repository-url>
+   cd <repository-folder>
 
-1. **Create a virtual environment (optional but recommended):**
-   ```bash
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On Mac/Linux:
-   source venv/bin/activate
-   ```
-
-2. **Install dependencies:**
+2. **Install the dependencies:**
    ```bash
    pip install -r requirements.txt
-   ```
 
-## 🚀 How to Use
-
-1. Run the server from your terminal:
+## Usage
+1. **Find your local IP address:**
+   Open your terminal and run ip a (Linux/Mac) or ipconfig (Windows) to find your machine's local IPv4 address (e.g., 192.168.1.x).
+2. **Start the server:**
    ```bash
    python app.py
-   ```
-2. A large QR code will appear directly in your command line.
-3. Open your phone's camera, scan the QR code, and your browser will instantly open the web app.
-4. Select a file and hit **Send File**. The file will be saved in the `/uploads` folder on your host machine.
+3. **Connect your devices:**
+   On the host machine, open a browser and navigate to https://localhost:5000 or https://127.0.0.1:5000.
 
-## 📁 Project Structure
-
-```
-lan-drop/
-│
-├── app.py                  # Main Flask & Waitress server logic
-├── requirements.txt        # Python dependencies
-├── .gitignore              # Ignores __pycache__ and uploads/
-│
-├── templates/
-│   └── index.html          # Main HTML structure
-│
-├── static/
-│   ├── style.css           # Custom CSS for the mobile-first UI
-│   └── file_upload_script.js # Client-side file chunking and UI updates
-│
-└── uploads/                # Directory where received files are saved
-```
-
+   On any other device connected to the same Wi-Fi network (like a phone or second laptop), navigate to https://<YOUR_LOCAL_IP>:5000.
+4. **Transfer Files:**
+   Enter a username on both devices, click a user from the connected peers list, select a file, and click send.
