@@ -1,24 +1,34 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, request, render_template
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 users = {}
 
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/user", methods=["GET"])
-def login():
-    username = request.args.get("username")
-    ipaddress = request.remote_addr
-    users[ipaddress] = username
-    print(users)
-    return render_template("usersList.html")
+@socketio.on('connect')
+def connect():
+    print(f"Client connected: {request.sid}")
 
-@app.route("/peers", methods=["GET"])
-def get_peers():
-    return jsonify({"peers": list(users.values())})
+@socketio.on("join")
+def join(data):
+    username = data["username"]
+    users[request.sid] = username
+    print(f"{username} joined")
+    socketio.emit("user_list", { "users": [{ "sid": sid, "username": username } for sid, username in users.items()] })
+
+
+@socketio.on("disconnect")
+def disconnect():
+    if request.sid in users:
+        username = users.pop(request.sid)
+        print(f"User disconnected: {username}")
+
+        socketio.emit("user_list", { "users": [{ "sid": sid, "username": username } for sid, username in users.items()] })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5000)

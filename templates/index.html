@@ -5,18 +5,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>P2P File Sharing</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <script src="{{ url_for('static', filename='login_script.js') }}"></script>
     </head>
     <body>   
-        <div class="container">
+        <div class="container" id="login">
             <h1>P2P File Sharing</h1>
 
             <div class="card">
-                <form method="get" action="/user">
-                    <input type="text" name="username" placeholder="Enter Name">
-                    <button type="submit">Login</button>
-                </form>
+                <input type="text" id="username" placeholder="Enter your Name">
+                <button id="login-btn">Login</button>
             </div>
         </div>
+
+        <div id="usersList" class="card" style="display: none">
+            <h2>Connected Users</h2>
+            <ul id="peers"></ul>
+        </div>
+
+        <dialog id="fileUpload" class="card">
+            <h2 id="receiver_username">Sending file to: N/A</h2>
+            <div class="upload-area">
+                <input type="file" id="fileInput" style="display: none;">
+                <button id="selectFileBtn">Select File</button>
+                <button id="sendFileBtn" disabled>Send</button>
+                <p id="fileNameDisplay">No file selected</p>
+            </div>
+        </dialog>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js" integrity="sha512-8BHxHDLsOHx+flIrQ0DrZcea7MkHqRU5GbTHmbdzMRnAaoCIkZ97PqZcXJkKZckMMhqfoeaJE+DNUVuyoQsO3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+        <script src="{{ url_for('static', filename='login_script.js') }}" defer></script>
     </body>
 </html>
