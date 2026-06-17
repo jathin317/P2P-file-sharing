@@ -58,7 +58,7 @@ function selectUser(sid, targetUsername) {
             sendButton.disabled = false;
             
             sendButton.onclick = () => {
-                initiateConnection();
+                await initiateConnection();
                 sendFile(file);
                 fileDialog.close();
             };
