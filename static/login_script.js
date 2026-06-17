@@ -57,7 +57,7 @@ function selectUser(sid, targetUsername) {
             document.getElementById("fileNameDisplay").innerText = file.name;
             sendButton.disabled = false;
             
-            sendButton.onclick = () => {
+            sendButton.onclick = async () => {
                 await initiateConnection();
                 sendFile(file);
                 fileDialog.close();
