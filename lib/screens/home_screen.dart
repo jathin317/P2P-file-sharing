@@ -21,16 +21,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _discovery = Discovery(myUsername: widget.username);
-    _discovery.start();
-
     _transfer = Transfer();
-    _initServer();
+    _discovery = Discovery(myUsername: widget.username);
+    _initServices();
   }
 
-  Future<void> _initServer() async {
+  Future<void> _initServices() async {
     final directory = await getApplicationDocumentsDirectory();
-    _transfer.startServer(saveDir: directory.path);
+    final assignedPort = await _transfer.startServer(
+      port: 0,
+      saveDir: directory.path,
+    );
+    _discovery.start(assignedPort);
   }
 
   @override
@@ -65,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final file = File(result.files.single.path!);
                     await _transfer.sendFile(
                       targetIp: peer.ip,
-                      targetPort: 6000,
+                      targetPort: peer.port,
                       file: file,
                     );
                     print("File sent to ${peer.username}");

@@ -9,13 +9,17 @@ class Transfer {
       StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get incomingStream => _incomingController.stream;
 
-  Future<void> startServer({int port = 6000, String saveDir = "."}) async {
+  Future<int> startServer({int port = 0, String saveDir = "."}) async {
     _server = await ServerSocket.bind(InternetAddress.anyIPv4, port);
-    print("TCP server listening on port $port");
+
+    final assignedPort = _server!.port;
+    print("TCP server listening on port $assignedPort");
 
     _server!.listen((Socket client) {
       _handleIncomingConnection(client, saveDir);
     });
+
+    return assignedPort;
   }
 
   void _handleIncomingConnection(Socket client, String savedir) {

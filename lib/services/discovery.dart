@@ -17,8 +17,13 @@ class Discovery {
 
   Discovery({required this.myUsername});
 
-  Future<void> start() async {
-    _listenSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 8080, reuseAddress: true, reusePort: true);
+  Future<void> start(int tcpPort) async {
+    _listenSocket = await RawDatagramSocket.bind(
+      InternetAddress.anyIPv4,
+      8080,
+      reuseAddress: true,
+      reusePort: true,
+    );
     _listenSocket!.broadcastEnabled = true;
 
     _listenSocket!.listen((event) {
@@ -33,7 +38,11 @@ class Discovery {
     _sendSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 8080);
     _sendSocket!.broadcastEnabled = true;
 
-    final message = jsonEncode({"username": myUsername, "type": "announce"});
+    final message = jsonEncode({
+      "username": myUsername,
+      "type": "announce",
+      "port": tcpPort,
+    });
     _broadcastTimer = Timer.periodic(Duration(seconds: 3), (timer) {
       _sendSocket!.send(
         utf8.encode(message),
@@ -51,6 +60,7 @@ class Discovery {
     final message = jsonDecode(utf8.decode(datagram.data));
     final senderIp = datagram.address.address;
     final senderUsername = message["username"];
+    final senderPort = message["port"] ?? 6000;
 
     if (senderUsername == myUsername) {
       return;
@@ -60,6 +70,7 @@ class Discovery {
       ip: senderIp,
       username: senderUsername,
       lastseen: DateTime.now(),
+      port: senderPort
     );
 
     _peersController.add(_peers.values.toList());
