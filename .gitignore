@@ -1,0 +1,6 @@
+/build
+/ios
+/macos
+/web
+.flutter-plugins-dependencies
+/.dart_tool
