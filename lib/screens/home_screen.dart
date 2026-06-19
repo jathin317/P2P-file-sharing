@@ -23,7 +23,35 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _transfer = Transfer();
     _discovery = Discovery(myUsername: widget.username);
+    _listenToIncomingTransfers();
     _initServices();
+  }
+
+  void _listenToIncomingTransfers() {
+    _transfer.incomingStream.listen((event) {
+      if (!mounted) return;
+
+      final status = event["status"];
+      final fileName = event["fileName"];
+
+      if (status == "started") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Receiving file $fileName..."),
+            duration: const Duration(days: 1),
+          ),
+        );
+      } else if (status == "completed") {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("$fileName downloaded."),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    });
   }
 
   Future<void> _initServices() async {
@@ -65,12 +93,46 @@ class _HomeScreenState extends State<HomeScreen> {
                   final result = await FilePicker.pickFiles(type: FileType.any);
                   if (result != null && result.files.single.path != null) {
                     final file = File(result.files.single.path!);
-                    await _transfer.sendFile(
-                      targetIp: peer.ip,
-                      targetPort: peer.port,
-                      file: file,
+                    final fileName = file.path.split("/").last;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Sending $fileName to ${peer.username}...",
+                        ),
+                        duration: const Duration(days: 1),
+                      ),
                     );
-                    print("File sent to ${peer.username}");
+
+                    try {
+                      await _transfer.sendFile(
+                        targetIp: peer.ip,
+                        targetPort: peer.port,
+                        file: file,
+                        onProgress: (progress) {
+                          print("Outgoing: ${(progress * 100).toInt()}%");
+                        },
+                      );
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("File sent!"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Transfer failed!"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
                   }
                 },
               );

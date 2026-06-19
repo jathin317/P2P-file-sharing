@@ -82,6 +82,7 @@ class Transfer {
     required String targetIp,
     required int targetPort,
     required File file,
+    void Function(double progress)? onProgress,
   }) async {
     final socket = await Socket.connect(targetIp, targetPort);
     final fileLength = await file.length();
@@ -89,7 +90,16 @@ class Transfer {
         "${jsonEncode({"name": file.path.split("/").last, "size": fileLength})}\n";
 
     socket.write(metadata);
-    await socket.addStream(file.openRead());
+
+    int bytesSent = 0;
+    final stream = file.openRead().map((chunk) {
+      bytesSent += chunk.length;
+      if (onProgress != null) {
+        onProgress(bytesSent / fileLength);
+      }
+      return chunk;
+    });
+    await socket.addStream(stream);
 
     await socket.flush();
     await socket.close();
