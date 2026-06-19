@@ -5,6 +5,7 @@ import '../services/transfer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'active_transfers_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String username;
@@ -23,41 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _transfer = Transfer();
     _discovery = Discovery(myUsername: widget.username);
-    _listenToIncomingTransfers();
     _initServices();
-  }
-
-  void _listenToIncomingTransfers() {
-    _transfer.incomingStream.listen((event) {
-      if (!mounted) return;
-
-      final status = event["status"];
-      final fileName = event["fileName"];
-
-      if (status == "started") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Receiving file $fileName..."),
-            duration: const Duration(days: 1),
-          ),
-        );
-      } else if (status == "completed") {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("$fileName downloaded."),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-    });
   }
 
   Future<void> _initServices() async {
     Directory? directory;
+
     if (Platform.isAndroid) {
-      directory = Directory("/storage/emulated/0/Download");
+      directory = Directory('/storage/emulated/0/Download');
       if (!await directory.exists()) {
         directory = await getExternalStorageDirectory();
       }
@@ -66,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       directory = await getDownloadsDirectory();
     }
-
     directory ??= await getApplicationDocumentsDirectory();
 
     final assignedPort = await _transfer.startServer(
@@ -79,13 +52,31 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _discovery.stop();
+    _transfer.stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("P2P File Sharing")),
+      appBar: AppBar(
+        title: const Text("P2P File Sharing"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.swap_vert),
+            tooltip: "Active Transfers",
+            onPressed: () {
+              // Navigate to the new screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ActiveTransfersScreen(transfer: _transfer),
+                ),
+              );
+            },
+          )
+        ],
+      ),
       body: StreamBuilder<List<Peer>>(
         stream: _discovery.peerStream,
         builder: (context, snapshot) {
@@ -106,45 +97,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   final result = await FilePicker.pickFiles(type: FileType.any);
                   if (result != null && result.files.single.path != null) {
                     final file = File(result.files.single.path!);
-                    final fileName = file.path.split("/").last;
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Sending $fileName to ${peer.username}...",
-                        ),
-                        duration: const Duration(days: 1),
-                      ),
+                    
+                    // We no longer await this or show snackbars!
+                    // It fires off in the background and the new screen tracks it.
+                    _transfer.sendFile(
+                      targetIp: peer.ip,
+                      targetPort: peer.port,
+                      file: file,
+                      myUsername: widget.username,
+                      targetUsername: peer.username,
                     );
-
-                    try {
-                      await _transfer.sendFile(
-                        targetIp: peer.ip,
-                        targetPort: peer.port,
-                        file: file,
-                        onProgress: (progress) {
-                          print("Outgoing: ${(progress * 100).toInt()}%");
-                        },
+                    
+                    // Automatically jump to the transfers screen so they can watch it
+                    if (mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ActiveTransfersScreen(transfer: _transfer),
+                        ),
                       );
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("File sent!"),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Transfer failed!"),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
                     }
                   }
                 },
