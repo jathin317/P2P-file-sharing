@@ -55,7 +55,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initServices() async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory? directory;
+    if (Platform.isAndroid) {
+      directory = Directory("/storage/emulated/0/Download");
+      if (!await directory.exists()) {
+        directory = await getExternalStorageDirectory();
+      }
+    } else if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      directory = await getDownloadsDirectory();
+    }
+
+    directory ??= await getApplicationDocumentsDirectory();
+
     final assignedPort = await _transfer.startServer(
       port: 0,
       saveDir: directory.path,
