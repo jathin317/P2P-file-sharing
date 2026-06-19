@@ -94,21 +94,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text(peer.username),
                 subtitle: Text(peer.ip),
                 onTap: () async {
-                  final result = await FilePicker.pickFiles(type: FileType.any);
-                  if (result != null && result.files.single.path != null) {
-                    final file = File(result.files.single.path!);
+                  final result = await FilePicker.pickFiles(
+                    type: FileType.any,
+                    allowMultiple: true, 
+                  );
+
+                  if (result != null && result.files.isNotEmpty) {
+                    for (var platformFile in result.files) {
+                      if (platformFile.path != null) {
+                        final file = File(platformFile.path!);
+                        _transfer.sendFile(
+                          targetIp: peer.ip,
+                          targetPort: peer.port,
+                          file: file,
+                          myUsername: widget.username,
+                          targetUsername: peer.username,
+                        );
+                      }
+                    }
                     
-                    // We no longer await this or show snackbars!
-                    // It fires off in the background and the new screen tracks it.
-                    _transfer.sendFile(
-                      targetIp: peer.ip,
-                      targetPort: peer.port,
-                      file: file,
-                      myUsername: widget.username,
-                      targetUsername: peer.username,
-                    );
-                    
-                    // Automatically jump to the transfers screen so they can watch it
                     if (mounted) {
                       Navigator.push(
                         context,
