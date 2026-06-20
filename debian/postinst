@@ -1,0 +1,10 @@
+#!/bin/bash
+ufw allow 8080/udp comment 'P2P App Discovery'
+
+SUBNET=$(ip -o -f inet addr show | awk '/scope global/ {print $4}' | head -n 1)
+
+if [ -n "$SUBNET" ]; then
+    ufw allow from $SUBNET to any proto tcp comment 'P2P App File Transfer'
+fi
+
+exit 0
