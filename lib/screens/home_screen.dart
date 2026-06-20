@@ -28,23 +28,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initServices() async {
-    Directory? directory;
+    Directory? baseDirectory;
 
     if (Platform.isAndroid) {
-      directory = Directory('/storage/emulated/0/Download');
-      if (!await directory.exists()) {
-        directory = await getExternalStorageDirectory();
+      baseDirectory = Directory('/storage/emulated/0/Download');
+      if (!await baseDirectory.exists()) {
+        baseDirectory = await getExternalStorageDirectory();
       }
     } else if (Platform.isIOS) {
-      directory = await getApplicationDocumentsDirectory();
+      baseDirectory = await getApplicationDocumentsDirectory();
     } else {
-      directory = await getDownloadsDirectory();
+      baseDirectory = await getDownloadsDirectory();
     }
-    directory ??= await getApplicationDocumentsDirectory();
+    baseDirectory ??= await getApplicationDocumentsDirectory();
+
+    final p2pDir = Directory("${baseDirectory.path}/p2p");
+    if (!await p2pDir.exists()) {
+      await p2pDir.create(recursive: true);
+    }
 
     final assignedPort = await _transfer.startServer(
       port: 0,
-      saveDir: directory.path,
+      saveDir: p2pDir.path,
     );
     _discovery.start(assignedPort);
   }
@@ -70,11 +75,12 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ActiveTransfersScreen(transfer: _transfer),
+                  builder: (context) =>
+                      ActiveTransfersScreen(transfer: _transfer),
                 ),
               );
             },
-          )
+          ),
         ],
       ),
       body: StreamBuilder<List<Peer>>(
@@ -96,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () async {
                   final result = await FilePicker.pickFiles(
                     type: FileType.any,
-                    allowMultiple: true, 
+                    allowMultiple: true,
                   );
 
                   if (result != null && result.files.isNotEmpty) {
@@ -112,12 +118,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }
                     }
-                    
+
                     if (mounted) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ActiveTransfersScreen(transfer: _transfer),
+                          builder: (context) =>
+                              ActiveTransfersScreen(transfer: _transfer),
                         ),
                       );
                     }
